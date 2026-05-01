@@ -98,6 +98,7 @@ function handleKeyEvent(code) {
             state.cursor = { line: state.lines.length - 1, col: state.lines.at(-1).length };
     }
     if (code === "larrow") {
+        state.cursor.col = Math.min(state.cursor.col, state.lines[state.cursor.line].length);
         state.cursor.col -= 1;
         if (state.cursor.col < 0) {
             const newLine = Math.max(state.cursor.line - 1, 0);
@@ -105,6 +106,7 @@ function handleKeyEvent(code) {
         }
     }
     if (code === "rarrow") {
+        state.cursor.col = Math.min(state.cursor.col, state.lines[state.cursor.line].length);
         state.cursor.col += 1;
         if (state.cursor.col > state.lines[state.cursor.line].length) {
             const newLine = Math.min(state.cursor.line + 1, state.lines.length - 1);
@@ -114,7 +116,9 @@ function handleKeyEvent(code) {
     const reg = asRegularKey(code);
     if (reg !== null) {
         state.lines[state.cursor.line] = state.lines[state.cursor.line].split("").toSpliced(state.cursor.col, 0, reg).join("");
-        state.cursor.col += 1;
+        if (state.cursor.col <= state.lines[state.cursor.line].length) {
+            state.cursor.col += 1;
+        }
     }
     if (code === "back") {
         if (state.cursor.col > 0) {
@@ -131,7 +135,7 @@ function handleKeyEvent(code) {
         const preLine = curLine.slice(0, state.cursor.col);
         const postLine = curLine.slice(state.cursor.col);
         state.lines[state.cursor.line] = preLine;
-        state.lines.splice(state.cursor.line, 0, postLine);
+        state.lines.splice(state.cursor.line + 1, 0, postLine);
         handleKeyEvent("rarrow");
     }
 }
@@ -143,7 +147,15 @@ const genSvgForState = () => {
             font-family: 'Courier New', Courier, monospace;
         }
     </style>
-    ${state.lines.map((line, i) => `<text y="${i + 1}lh">${line}</text>`)};
+    ${state.lines.map((line, i) => {
+        if (state.cursor.line === i){
+            let a = line.slice(0, state.cursor.col);
+            let b = line.slice(state.cursor.col);
+            return `<text y="${i + 1}lh">${a}<tspan>^</tspan>${b}</text>`;
+        } else {
+            return `<text y="${i + 1}lh">${line}</text>`;
+        }
+    })};
     </svg>`;
 }
 
