@@ -136,14 +136,72 @@ function handleKeyEvent(code) {
     }
 }
 
+const genSvgForState = () => {
+    return `<svg xmlns="http://www.w3.org/2000/svg" height="${state.lines.length + 2}lh" width="500px">
+    <style>
+        text {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+    ${state.lines.map((line, i) => `<text y="${i + 1}lh">${line}</text>`)};
+    </svg>`;
+}
+
+function sendState(res, content) {
+    // client.write(`Content-Type: image/svg+xml\r\n\r\n${content}\r\n--endofsection\r\n`);
+    res.write(content);
+	res.write(`--endofsection\n`);
+	res.write(`Content-Type:image/svg+xml\n\n`);
+}
+
+const clients = [];
+
+setInterval(() => console.log(`${clients.length} clients alive`), 1000);
+
 app.get("/k/*splat", (req, res) => {
     const keycode = req.path.split("/").at(-1);
     console.log(keycode);
     handleKeyEvent(keycode);
     res.statusCode = 204;
     res.send("foo");
+
+    const content = genSvgForState();
+    for (const client of clients) {
+        sendState(client, content);
+    }
+});
+
+app.get("/s", (req, res) => {
+    res.writeHead(200, {
+		'Cache-Control': 'no-store, no-cache, must-revalidate, pre-check=0, post-check=0, max-age=0',
+		Pragma: 'no-cache',
+		Connection: 'close',
+		'Content-Type': 'multipart/x-mixed-replace; boundary=--endofsection'
+	});
+    // res.flushHeaders();
+    
+    // sendState(res, genSvgForState());
+
+    res.write(`Content-Type:image/svg+xml\n\n`);
+	res.write(genSvgForState());
+	res.write(`--endofsection\n`);
+
+    res.write(`Content-Type:image/svg+xml\n\n`);
+    res.write(genSvgForState());
+	res.write(`--endofsection\n`);
+	res.write(`Content-Type:image/svg+xml\n\n`);
+
+    clients.push(res);
+    req.on("close", () => {
+        console.log("closed?");
+        res.end("fooo");
+        clients.splice(clients.indexOf(res), 1);
+    })
 });
 
 app.listen(PORT, () => {
 	console.log(`running on port ${PORT}`);
 })
+
+console.log("TODO: use compression!!!!");
+console.warn("TODO: use compression!!!!");
