@@ -44,13 +44,14 @@ const loadState = async () => {
         const state = JSON.parse((await fs.readFile("saved.json")).toString());
         return state;
     } catch {
-        // console.log("recreated state");
-        return {
-            dislikes_map: {},
-            has_disliked_map: {},
-            // user_states: {},
-        }
+        return defaultState();
     }
+}
+const defaultState = () => {
+    return {
+        lines: [""],
+        cursor: { line: 0, col: 0 },
+    };
 }
 
 setInterval(() => saveState("interval"), 1000 * 10);
@@ -63,9 +64,82 @@ function respond_dummy_image(res) {
 	res.send(`<svg xmlns="http://www.w3.org/2000/svg" height="0" width="0"></svg>`);
 }
 
+const asFunctionKey = code => {
+    return code.match(/^F(\d\d?)$/)?.[1] || null;
+}
+const asRegularKey = code => {
+    if (code.length === 1) return code;
+    if (code === "ah") return "å";
+    if (code === "eh") return "ä";
+    if (code === "oh") return "ö";
+    if (code === "lt") return "<";
+    if (code === "comma") return ",";
+    if (code === "punkt") return ".";
+    if (code === "hyph") return "-";
+    if (code === "apo") return "'";
+    if (code === "tick") return "´";
+    if (code === "+") return "+";
+    if (code === "deg") return "§";
+    return null;
+}
+const asArrow = code => {
+    return code.match(/^(\w)arrow$/)?.[1] || null;
+}
+
+function handleKeyEvent(code) {
+    if (code === "uarrow") {
+        state.cursor.line -= 1;
+        if (state.cursor.line < 0)
+            state.cursor = { line: 0, col: 0 };
+    }
+    if (code === "darrow") {
+        state.cursor.line += 1;
+        if (state.cursor.line > state.lines.length - 1)
+            state.cursor = { line: state.lines.length - 1, col: state.lines.at(-1).length };
+    }
+    if (code === "larrow") {
+        state.cursor.col -= 1;
+        if (state.cursor.col < 0) {
+            const newLine = Math.max(state.cursor.line - 1, 0);
+            state.cursor = { line: newLine, col: state.lines[newLine].length };
+        }
+    }
+    if (code === "rarrow") {
+        state.cursor.col += 1;
+        if (state.cursor.col > state.lines[state.cursor.line].length) {
+            const newLine = Math.min(state.cursor.line + 1, state.lines.length - 1);
+            state.cursor = { line: newLine, col: state.cursor.line === state.lines.length - 1 ? state.lines.at(-1).length : 0 };
+        }
+    }
+    const reg = asRegularKey(code);
+    if (reg !== null) {
+        state.lines[state.cursor.line] = state.lines[state.cursor.line].split("").toSpliced(state.cursor.col, 0, reg).join("");
+        state.cursor.col += 1;
+    }
+    if (code === "back") {
+        if (state.cursor.col > 0) {
+            state.lines[state.cursor.line] = state.lines[state.cursor.line].split("").toSpliced(state.cursor.col - 1, 1).join("");
+            state.cursor.col -= 1;
+        } else if (state.cursor.line > 0) {
+            const oldLine = state.cursor.line;
+            handleKeyEvent("larrow");
+            state.lines.splice(oldLine, 1);
+        }
+    }
+    if (code === "enter") {
+        const curLine = state.lines[state.cursor.line];
+        const preLine = curLine.slice(0, state.cursor.col);
+        const postLine = curLine.slice(state.cursor.col);
+        state.lines[state.cursor.line] = preLine;
+        state.lines.splice(state.cursor.line, 0, postLine);
+        handleKeyEvent("rarrow");
+    }
+}
+
 app.get("/k/*splat", (req, res) => {
     const keycode = req.path.split("/").at(-1);
     console.log(keycode);
+    handleKeyEvent(keycode);
     res.statusCode = 204;
     res.send("foo");
 });
