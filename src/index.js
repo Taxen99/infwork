@@ -56,7 +56,7 @@ const defaultState = () => {
     };
 }
 
-setInterval(() => saveState("interval"), 1000 * 10);
+setInterval(() => saveState("interval"), 1000 * 60*30);
 
 const state = await loadState();
 
