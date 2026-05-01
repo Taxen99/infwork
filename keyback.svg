@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="693px" height="288px">
+    <style>
+        svg {
+            background: linear-gradient(74deg, #82dfc7, #c993ee, #93adee, #ee93ba, #ffffff, #93eeeb, #eedc93, #ee9393, #98ee93, #82dfc7);
+    background-size: 2000% 2000%;
+
+            animation: AnimationName 21s ease infinite;
+        }
+
+        @keyframes AnimationName {
+            0%{background-position:75% 0%}
+            50%{background-position:26% 90%}
+            100%{background-position:75% 0%}
+        }
+    </style>
+</svg>

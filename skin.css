@@ -1,7 +1,24 @@
+#workskin * {
+    box-sizing: border-box;
+}
+
+.keyboard-outer {
+    position: relative;
+    border: 2px dotted black;
+    border-radius: 4px;
+}
+
+.keyboard-outer > img {
+    width: 100%;
+    display: block;
+}
+
 .keyboard {
-    width: 720px;
-    height: 288px;
-    background-color: blue;
+    position: absolute;
+    top:0;bottom:0;left:0;right:0;
+    /* width: 720px;
+    height: 288px; */
+    /* background-color: blue; */
     display: flex;
     flex-direction: column;
 }
@@ -11,17 +28,17 @@
     /* background-color: aqua; */
     height: 16.666666666%;
     display: flex;
-    outline: 1px solid red;
+    /* outline: 1px solid red; */
     padding: 0.27777777777%;
 }
 
 .keyrow > div:not(.arm), .ark {
     /* height: 100%; */
-    border: 2px solid pink;
-    background-color: aquamarine;
+    /* border: 10% solid pink; */
+    padding: 2px;
 }
 .keyrow > div, .ark {
-    margin-right: 0.69444444444%;
+    margin-right: 0.7215007215%;
 }
 
 .keyrow > div:last-child {
@@ -29,15 +46,23 @@
 }
 
 .reg {
-    width: 5.58766666%;
+    width: 6.20490620491%;
 }
 
 .ret.ret.ret {
-    width: 3.19444444444%;
+    width: 4.19444444444%;
     border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     position: relative;
-    top: -12.6%;
-    height: 110%;
+    top: -18.4%;
+    height: 118%;
+}
+
+.rettop.rettop.rettop {
+    position: relative;
+    z-index: 1;
+    border-bottom-right-radius: 0;
 }
 
 .esc {
@@ -58,15 +83,15 @@
 
 .ark.ark.ark {
     /* flex-grow: 1; */
-    height: 38.4166666667%;
+    height: 48.3111111111%;
     margin-top: auto;
 }
 .ark.ark.ark:first-child {
-    margin-right: 0.69444444444%;
+    margin-right: 0.7215007215%;
 }
 
 .arm {
-    margin-right: 0.69444444444%;
+    margin-right: 0.7215007215%;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -74,6 +99,54 @@
 }
 
 .arm > .ark.ark.ark {
-    height: 38.3111111111%;
-    margin-right: 0;
+    margin: 0;
+}
+
+/* .key::after {
+    content: "aa";
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    position: relative;
+} */
+
+.rettop > a {
+    position: relative;
+    z-index: 2;
+}
+
+.key {
+    outline-offset: -2px;
+    /* outline: 2px solid black; */
+    border: 2px solid black;
+    border-radius: 5px;
+    background-color: rgb(34, 34, 34);
+    color: rgb(231, 231, 231);
+    transform-origin: center;
+}
+.rettop::before {
+    position: absolute;
+    top:0;bottom:0;left:3px;right:0;
+    z-index: 1;
+    content: "";
+    background-color: inherit;
+}
+
+.keyboard a {
+    text-decoration: none;
+    border: none;
+    color: inherit;
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* background-color: red; */
+    opacity: 0.5;
+}
+
+.key:has(a:hover), .keyboard:has(.retsome > a:hover) :is(.retsome) {
+    color: white;
+    background-color: rgb(20, 20, 20);
+    border-color: rgb(79, 41, 86);
+    transform: scale(1.1);
 }

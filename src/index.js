@@ -63,6 +63,13 @@ function respond_dummy_image(res) {
 	res.send(`<svg xmlns="http://www.w3.org/2000/svg" height="0" width="0"></svg>`);
 }
 
-app.get("/l", (req, res) => {
-
+app.get("/k/*splat", (req, res) => {
+    const keycode = req.path.split("/").at(-1);
+    console.log(keycode);
+    res.statusCode = 204;
+    res.send("foo");
 });
+
+app.listen(PORT, () => {
+	console.log(`running on port ${PORT}`);
+})
