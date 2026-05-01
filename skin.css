@@ -1,0 +1,79 @@
+.keyboard {
+    width: 720px;
+    height: 288px;
+    background-color: blue;
+    display: flex;
+    flex-direction: column;
+}
+
+.keyrow {
+    max-width: 100%;
+    /* background-color: aqua; */
+    height: 16.666666666%;
+    display: flex;
+    outline: 1px solid red;
+    padding: 0.27777777777%;
+}
+
+.keyrow > div:not(.arm), .ark {
+    /* height: 100%; */
+    border: 2px solid pink;
+    background-color: aquamarine;
+}
+.keyrow > div, .ark {
+    margin-right: 0.69444444444%;
+}
+
+.keyrow > div:last-child {
+    margin-right: 0;
+}
+
+.reg {
+    width: 5.58766666%;
+}
+
+.ret.ret.ret {
+    width: 3.19444444444%;
+    border-top: none;
+    position: relative;
+    top: -12.6%;
+    height: 110%;
+}
+
+.esc {
+    flex-grow: 1;
+}
+
+.sft {
+    width: 9%;
+}
+
+.spc {
+    width: 32.93833333333%;
+}
+
+.cmd {
+    width: 9%;
+}
+
+.ark.ark.ark {
+    /* flex-grow: 1; */
+    height: 38.4166666667%;
+    margin-top: auto;
+}
+.ark.ark.ark:first-child {
+    margin-right: 0.69444444444%;
+}
+
+.arm {
+    margin-right: 0.69444444444%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.arm > .ark.ark.ark {
+    height: 38.3111111111%;
+    margin-right: 0;
+}
