@@ -2,6 +2,24 @@
     box-sizing: border-box;
 }
 
+.screen {
+    overflow: scroll;
+    height: 300px;
+}
+.screenimg {
+    margin-bottom: 100px;
+}
+
+.screen::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+.screen::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
 .keyboard-outer {
     position: relative;
     border: 2px dotted black;

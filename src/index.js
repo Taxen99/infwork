@@ -2,6 +2,7 @@ import express from "express";
 // import cookieParser from "cookie-parser";
 import fs from "fs/promises"
 import cors from "cors";
+import compression from "compression";
 
 const app = express();
 const PORT = process.env.PORT || 4069;
@@ -9,6 +10,7 @@ const PORT = process.env.PORT || 4069;
 // const arrayRandom = array => array[Math.floor(Math.random() * array.length)];
 
 app.use(cors())
+app.use(compression())
 // app.use(cors({
 //     origin: "http://dommy.com:8000",
 //     credentials: true
@@ -80,6 +82,7 @@ const asRegularKey = code => {
     if (code === "tick") return "´";
     if (code === "+") return "+";
     if (code === "deg") return "§";
+    if (code === "space") return " ";
     return null;
 }
 const asArrow = code => {
@@ -125,9 +128,10 @@ function handleKeyEvent(code) {
             state.lines[state.cursor.line] = state.lines[state.cursor.line].split("").toSpliced(state.cursor.col - 1, 1).join("");
             state.cursor.col -= 1;
         } else if (state.cursor.line > 0) {
-            const oldLine = state.cursor.line;
+            const toAppend = state.lines[state.cursor.line];
             handleKeyEvent("larrow");
-            state.lines.splice(oldLine, 1);
+            state.lines.splice(state.cursor.line + 1, 1);
+            state.lines[state.cursor.line] = state.lines[state.cursor.line] + toAppend;
         }
     }
     if (code === "enter") {
@@ -141,22 +145,30 @@ function handleKeyEvent(code) {
 }
 
 const genSvgForState = () => {
-    return `<svg xmlns="http://www.w3.org/2000/svg" height="${state.lines.length + 2}lh" width="500px">
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" height="${state.lines.length + 2}lh" width="500px">
     <style>
-        text {
+        * {
             font-family: 'Courier New', Courier, monospace;
         }
-    </style>
-    ${state.lines.map((line, i) => {
-        if (state.cursor.line === i){
-            let a = line.slice(0, state.cursor.col);
-            let b = line.slice(state.cursor.col);
-            return `<text y="${i + 1}lh">${a}<tspan>^</tspan>${b}</text>`;
-        } else {
-            return `<text y="${i + 1}lh">${line}</text>`;
+        rect {
+            fill: black;
+            width: 2px;
+            height: 1lh;
+            animation: blink 0.5s step-end 0s infinite;
+            transform: translateY(0.2lh);
         }
+        @keyframes blink {
+            50% {
+                opacity: 0.0;
+            }
+        }
+    </style>
+    <rect y="${state.cursor.line}lh" x="${Math.min(state.cursor.col, state.lines[state.cursor.line].length)}ch"></rect>
+    ${state.lines.map((line, i) => {
+        return `<text y="${i + 1}lh">${line.replaceAll(" ", "&#xA0;")}</text>`;
     })};
     </svg>`;
+    return svg;
 }
 
 function sendState(res, content) {
